@@ -10,4 +10,7 @@ pub(all) suberror LinAlgError {
   /// A matrix is singular or rank-deficient where an inverse or unique
   /// solution is required (for example a zero pivot in LU).
   Singular
+  /// Cholesky factorization was asked of a matrix that is not symmetric
+  /// positive-definite (a non-positive diagonal pivot).
+  NotPositiveDefinite
 }

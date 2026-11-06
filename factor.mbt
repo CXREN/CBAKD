@@ -124,3 +124,63 @@ pub fn LU::inverse(self : LU) -> Matrix {
   }
   inv
 }
+
+/// Cholesky factorization of a symmetric positive-definite matrix.
+///
+/// `cholesky(a)` returns the lower-triangular `L` such that `A = L·Lᵀ`. Only
+/// the lower triangle of `a` is read; symmetry is the caller's contract.
+/// Raises `NotPositiveDefinite` when a diagonal pivot is non-positive.
+
+pub fn cholesky(a : Matrix) -> Matrix raise LinAlgError {
+  if !a.is_square() {
+    raise DimensionMismatch
+  }
+  let n = a.rows()
+  let l = Matrix::zeros(n, n)
+  for i in 0..<n {
+    for j in 0..=i {
+      let mut s = a.get(i, j)
+      for k in 0..<j {
+        s = s - l.get(i, k) * l.get(j, k)
+      }
+      if i == j {
+        if s <= 0.0 {
+          raise NotPositiveDefinite
+        }
+        l.set(i, j, s.sqrt())
+      } else {
+        l.set(i, j, s / l.get(j, j))
+      }
+    }
+  }
+  l
+}
+
+/// Solve `A·x = b` for a symmetric positive-definite `A` via Cholesky.
+pub fn cholesky_solve(a : Matrix, b : Vector) -> Vector raise LinAlgError {
+  let n = a.rows()
+  if b.length() != n {
+    raise DimensionMismatch
+  }
+  let l = cholesky(a)
+  // Forward substitution: L·y = b.
+  let y = Vector::zeros(n)
+  for i in 0..<n {
+    let mut s = b.get(i)
+    for j in 0..<i {
+      s = s - l.get(i, j) * y.get(j)
+    }
+    y.set(i, s / l.get(i, i))
+  }
+  // Back substitution: Lᵀ·x = y.
+  let x = Vector::zeros(n)
+  for i in 0..<n {
+    let r = n - 1 - i
+    let mut s = y.get(r)
+    for j in (r + 1)..<n {
+      s = s - l.get(j, r) * x.get(j)
+    }
+    x.set(r, s / l.get(r, r))
+  }
+  x
+}

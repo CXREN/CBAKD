@@ -98,3 +98,37 @@ test "lu raises DimensionMismatch on a non-square matrix" {
   }
   assert_true(is_dim)
 }
+
+test "cholesky reconstructs A = L*Lᵀ" {
+  let a = Matrix::new(3, 3, [4.0, 12.0, -16.0, 12.0, 37.0, -43.0, -16.0, -43.0, 98.0])
+  let l = cholesky(a)
+  assert_true(close(l.get(0, 0), 2.0))
+  assert_true(close(l.get(1, 0), 6.0))
+  assert_true(close(l.get(1, 1), 1.0))
+  assert_true(close(l.get(2, 0), -8.0))
+  assert_true(close(l.get(2, 1), 5.0))
+  assert_true(close(l.get(2, 2), 3.0))
+  assert_true(mat_close(l.mul(l.transpose()), a))
+}
+
+test "cholesky_solve solves a positive-definite system" {
+  let a = Matrix::new(3, 3, [4.0, 12.0, -16.0, 12.0, 37.0, -43.0, -16.0, -43.0, 98.0])
+  let b = Vector::new([-20.0, -43.0, 192.0])
+  let x = cholesky_solve(a, b)
+  // Known solution x = [1, 2, 3].
+  assert_true(close(x.get(0), 1.0))
+  assert_true(close(x.get(1), 2.0))
+  assert_true(close(x.get(2), 3.0))
+}
+
+test "cholesky raises NotPositiveDefinite on an indefinite matrix" {
+  let a = Matrix::new(2, 2, [1.0, 2.0, 2.0, 1.0])
+  let is_npd = try {
+    let _ = cholesky(a)
+    false
+  } catch {
+    NotPositiveDefinite => true
+    _ => false
+  }
+  assert_true(is_npd)
+}
