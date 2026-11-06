@@ -184,3 +184,103 @@ pub fn cholesky_solve(a : Matrix, b : Vector) -> Vector raise LinAlgError {
   }
   x
 }
+
+/// QR factorization of a tall (`m ≥ n`) matrix via Householder reflectors.
+///
+/// `qr(a)` returns `Q` (`m × m`, orthogonal) and `R` (`m × n`, upper
+/// triangular in its top `n × n` block) such that `A = Q·R`. Raises
+/// `DimensionMismatch` when the matrix has more columns than rows.
+
+pub struct QR {
+  q : Matrix
+  r : Matrix
+}
+
+pub fn qr(a : Matrix) -> QR raise LinAlgError {
+  let m = a.rows()
+  let n = a.cols()
+  if m < n {
+    raise DimensionMismatch
+  }
+  let r = a.copy()
+  let q = Matrix::identity(m)
+  for k in 0..<n {
+    // Norm of the sub-column R[k:m, k].
+    let mut normx = 0.0
+    for i in k..<m {
+      normx = normx + r.get(i, k) * r.get(i, k)
+    }
+    normx = normx.sqrt()
+    if normx != 0.0 {
+      let x0 = r.get(k, k)
+      let alpha = if x0 >= 0.0 { -normx } else { normx }
+      // Householder vector v = x - alpha·e₁.
+      let v = Array::make(m - k, 0.0)
+      v[0] = x0 - alpha
+      let mut beta = v[0] * v[0]
+      for i in (k + 1)..<m {
+        v[i - k] = r.get(i, k)
+        beta = beta + v[i - k] * v[i - k]
+      }
+      if beta != 0.0 {
+        // Apply H = I - 2·v·vᵀ/β to R[k:m, k:n].
+        for j in k..<n {
+          let mut s = 0.0
+          for i in k..<m {
+            s = s + v[i - k] * r.get(i, j)
+          }
+          let w = 2.0 * s / beta
+          for i in k..<m {
+            r.set(i, j, r.get(i, j) - w * v[i - k])
+          }
+        }
+        // Accumulate Q = Q·H.
+        for i in 0..<m {
+          let mut s = 0.0
+          for l in k..<m {
+            s = s + q.get(i, l) * v[l - k]
+          }
+          let w = 2.0 * s / beta
+          for l in k..<m {
+            q.set(i, l, q.get(i, l) - w * v[l - k])
+          }
+        }
+      }
+      // The reflector collapses column k to alpha·e₁; enforce clean zeros.
+      r.set(k, k, alpha)
+      for i in (k + 1)..<m {
+        r.set(i, k, 0.0)
+      }
+    }
+  }
+  { q, r }
+}
+
+/// Solve the least-squares problem `min ‖A·x − b‖₂` using `A = Q·R`.
+///
+/// Computes `x = R⁻¹ · (Qᵀ b)` on the top `n × n` block of `R`.
+pub fn QR::solve(self : QR, b : Vector) -> Vector raise LinAlgError {
+  let m = self.q.rows()
+  let n = self.r.cols()
+  if b.length() != m {
+    raise DimensionMismatch
+  }
+  let c = Vector::zeros(n)
+  for i in 0..<n {
+    let mut s = 0.0
+    for j in 0..<m {
+      s = s + self.q.get(j, i) * b.get(j)
+    }
+    c.set(i, s)
+  }
+  let x = Vector::zeros(n)
+  for i in 0..<n {
+    let row = n - 1 - i
+    let mut s = c.get(row)
+    for j in (row + 1)..<n {
+      s = s - self.r.get(row, j) * x.get(j)
+    }
+    x.set(row, s / self.r.get(row, row))
+  }
+  x
+}

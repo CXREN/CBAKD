@@ -132,3 +132,31 @@ test "cholesky raises NotPositiveDefinite on an indefinite matrix" {
   }
   assert_true(is_npd)
 }
+
+test "qr reconstructs A = Q*R and Q is orthogonal" {
+  let a = Matrix::new(4, 3, [1.0, 1.0, 1.0, 1.0, 2.0, 4.0, 1.0, 3.0, 9.0, 1.0, 4.0, 16.0])
+  let f = qr(a)
+  assert_true(mat_close(f.q.mul(f.r), a))
+  assert_true(mat_close(f.q.transpose().mul(f.q), Matrix::identity(4)))
+}
+
+test "qr solves an overdetermined least-squares system" {
+  // Fit y = 2 + 3x at x = 0,1,2,3.
+  let a = Matrix::new(4, 2, [1.0, 0.0, 1.0, 1.0, 1.0, 2.0, 1.0, 3.0])
+  let b = Vector::new([2.0, 5.0, 8.0, 11.0])
+  let x = qr(a).solve(b)
+  assert_true(close(x.get(0), 2.0))
+  assert_true(close(x.get(1), 3.0))
+}
+
+test "qr raises DimensionMismatch when m < n" {
+  let a = Matrix::zeros(2, 3)
+  let is_dim = try {
+    let _ = qr(a)
+    false
+  } catch {
+    DimensionMismatch => true
+    _ => false
+  }
+  assert_true(is_dim)
+}
