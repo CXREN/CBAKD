@@ -1,0 +1,3 @@
+// CBAKD is a flat single-package library: matrix/vector types and the
+// factorizations, solvers, eigensolvers, SVD, and PCA modules live together
+// in one package with no internal subpackage boundaries.

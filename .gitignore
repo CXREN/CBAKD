@@ -1,0 +1,12 @@
+# MoonBit build output
+_build/
+target/
+
+# Editor / OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local scratch
+*.log
