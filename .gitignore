@@ -1,6 +1,8 @@
-# MoonBit build output
+# MoonBit build output and generated artifacts
 _build/
 target/
+.mooncakes/
+*.mbti
 
 # Editor / OS noise
 .vscode/
