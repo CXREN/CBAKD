@@ -66,6 +66,15 @@ pub fn Matrix::is_square(self : Matrix) -> Bool {
   self.rows == self.cols
 }
 
+/// Deep copy: a new matrix with the same shape and values.
+pub fn Matrix::copy(self : Matrix) -> Matrix {
+  let d = Array::make(self.data.length(), 0.0)
+  for i in 0..<self.data.length() {
+    d[i] = self.data[i]
+  }
+  { rows: self.rows, cols: self.cols, data: d }
+}
+
 /// Transpose: the `cols × rows` matrix with rows and columns swapped.
 pub fn Matrix::transpose(self : Matrix) -> Matrix {
   let t = Matrix::zeros(self.cols, self.rows)
@@ -75,6 +84,26 @@ pub fn Matrix::transpose(self : Matrix) -> Matrix {
     }
   }
   t
+}
+
+/// Column `j` as a fresh vector.
+pub fn Matrix::column(self : Matrix, j : Int) -> Vector {
+  let v = Vector::zeros(self.rows)
+  for i in 0..<self.rows {
+    v.data[i] = self.data[i * self.cols + j]
+  }
+  v
+}
+
+/// Swap rows `i` and `j` in place.
+pub fn Matrix::swap_rows(self : Matrix, i : Int, j : Int) -> Unit {
+  if i != j {
+    for c in 0..<self.cols {
+      let t = self.data[i * self.cols + c]
+      self.data[i * self.cols + c] = self.data[j * self.cols + c]
+      self.data[j * self.cols + c] = t
+    }
+  }
 }
 
 /// Multiply every element by a scalar.

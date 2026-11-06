@@ -7,4 +7,7 @@
 pub(all) suberror LinAlgError {
   /// Matrix and/or vector dimensions do not agree.
   DimensionMismatch
+  /// A matrix is singular or rank-deficient where an inverse or unique
+  /// solution is required (for example a zero pivot in LU).
+  Singular
 }
