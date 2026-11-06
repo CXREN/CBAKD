@@ -1,3 +1,4 @@
+///|
 test "eig_sym diagonalizes a symmetric matrix" {
   let a = Matrix::new(3, 3, [4.0, 1.0, 2.0, 1.0, 3.0, 0.0, 2.0, 0.0, 5.0])
   let (w, v) = eig_sym(a)
@@ -14,6 +15,7 @@ test "eig_sym diagonalizes a symmetric matrix" {
   assert_true(mat_close(v.transpose().mul(v), Matrix::identity(n)))
 }
 
+///|
 test "eig_sym returns known eigenvalues for a 2x2" {
   let a = Matrix::new(2, 2, [2.0, 1.0, 1.0, 2.0])
   let (w, v) = eig_sym(a)
@@ -24,6 +26,7 @@ test "eig_sym returns known eigenvalues for a 2x2" {
   assert_true(close(v.get(0, 0) * v.get(0, 0) + v.get(1, 0) * v.get(1, 0), 1.0))
 }
 
+///|
 test "eig_sym handles a diagonal matrix" {
   let a = Matrix::new(3, 3, [3.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 2.0])
   let (w, v) = eig_sym(a)

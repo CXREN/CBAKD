@@ -1,3 +1,4 @@
+///|
 fn lu_lower(l : LU) -> Matrix {
   let n = l.lu.rows()
   let m = Matrix::identity(n)
@@ -9,6 +10,7 @@ fn lu_lower(l : LU) -> Matrix {
   m
 }
 
+///|
 fn lu_upper(l : LU) -> Matrix {
   let n = l.lu.rows()
   let m = Matrix::zeros(n, n)
@@ -20,6 +22,7 @@ fn lu_upper(l : LU) -> Matrix {
   m
 }
 
+///|
 test "lu reconstructs P*A = L*U with partial pivoting" {
   let a = Matrix::new(3, 3, [0.0, 1.0, 2.0, 1.0, 0.0, 3.0, 2.0, 3.0, 0.0])
   let f = lu(a)
@@ -34,6 +37,7 @@ test "lu reconstructs P*A = L*U with partial pivoting" {
   assert_true(mat_close(pa, lu_product))
 }
 
+///|
 test "lu solves a linear system" {
   let a = Matrix::new(3, 3, [2.0, 1.0, -1.0, -3.0, -1.0, 2.0, -2.0, 1.0, 2.0])
   let b = Vector::new([8.0, -11.0, -3.0])
@@ -44,17 +48,20 @@ test "lu solves a linear system" {
   assert_true(close(x.get(2), -1.0))
 }
 
+///|
 test "lu computes the determinant" {
   let a = Matrix::new(2, 2, [1.0, 2.0, 3.0, 4.0])
   assert_true(close(lu(a).det(), -2.0))
 }
 
+///|
 test "lu inverts an invertible matrix" {
   let a = Matrix::new(2, 2, [4.0, 7.0, 2.0, 6.0])
   let inv = lu(a).inverse()
   assert_true(mat_close(a.mul(inv), Matrix::identity(2)))
 }
 
+///|
 test "lu raises Singular on a singular matrix" {
   let a = Matrix::new(2, 2, [1.0, 2.0, 2.0, 4.0])
   let is_singular = try {
@@ -67,6 +74,7 @@ test "lu raises Singular on a singular matrix" {
   assert_true(is_singular)
 }
 
+///|
 test "lu raises DimensionMismatch on a non-square matrix" {
   let a = Matrix::zeros(2, 3)
   let is_dim = try {
@@ -79,8 +87,11 @@ test "lu raises DimensionMismatch on a non-square matrix" {
   assert_true(is_dim)
 }
 
+///|
 test "cholesky reconstructs A = L*Lᵀ" {
-  let a = Matrix::new(3, 3, [4.0, 12.0, -16.0, 12.0, 37.0, -43.0, -16.0, -43.0, 98.0])
+  let a = Matrix::new(3, 3, [
+    4.0, 12.0, -16.0, 12.0, 37.0, -43.0, -16.0, -43.0, 98.0,
+  ])
   let l = cholesky(a)
   assert_true(close(l.get(0, 0), 2.0))
   assert_true(close(l.get(1, 0), 6.0))
@@ -91,8 +102,11 @@ test "cholesky reconstructs A = L*Lᵀ" {
   assert_true(mat_close(l.mul(l.transpose()), a))
 }
 
+///|
 test "cholesky_solve solves a positive-definite system" {
-  let a = Matrix::new(3, 3, [4.0, 12.0, -16.0, 12.0, 37.0, -43.0, -16.0, -43.0, 98.0])
+  let a = Matrix::new(3, 3, [
+    4.0, 12.0, -16.0, 12.0, 37.0, -43.0, -16.0, -43.0, 98.0,
+  ])
   let b = Vector::new([-20.0, -43.0, 192.0])
   let x = cholesky_solve(a, b)
   // Known solution x = [1, 2, 3].
@@ -101,6 +115,7 @@ test "cholesky_solve solves a positive-definite system" {
   assert_true(close(x.get(2), 3.0))
 }
 
+///|
 test "cholesky raises NotPositiveDefinite on an indefinite matrix" {
   let a = Matrix::new(2, 2, [1.0, 2.0, 2.0, 1.0])
   let is_npd = try {
@@ -113,13 +128,17 @@ test "cholesky raises NotPositiveDefinite on an indefinite matrix" {
   assert_true(is_npd)
 }
 
+///|
 test "qr reconstructs A = Q*R and Q is orthogonal" {
-  let a = Matrix::new(4, 3, [1.0, 1.0, 1.0, 1.0, 2.0, 4.0, 1.0, 3.0, 9.0, 1.0, 4.0, 16.0])
+  let a = Matrix::new(4, 3, [
+    1.0, 1.0, 1.0, 1.0, 2.0, 4.0, 1.0, 3.0, 9.0, 1.0, 4.0, 16.0,
+  ])
   let f = qr(a)
   assert_true(mat_close(f.q.mul(f.r), a))
   assert_true(mat_close(f.q.transpose().mul(f.q), Matrix::identity(4)))
 }
 
+///|
 test "qr solves an overdetermined least-squares system" {
   // Fit y = 2 + 3x at x = 0,1,2,3.
   let a = Matrix::new(4, 2, [1.0, 0.0, 1.0, 1.0, 1.0, 2.0, 1.0, 3.0])
@@ -129,6 +148,7 @@ test "qr solves an overdetermined least-squares system" {
   assert_true(close(x.get(1), 3.0))
 }
 
+///|
 test "qr raises DimensionMismatch when m < n" {
   let a = Matrix::zeros(2, 3)
   let is_dim = try {

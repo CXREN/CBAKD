@@ -1,3 +1,4 @@
+///|
 test "solve solves a square system" {
   let a = Matrix::new(2, 2, [3.0, 1.0, 1.0, 2.0])
   let b = Vector::new([5.0, 5.0])
@@ -6,6 +7,7 @@ test "solve solves a square system" {
   assert_true(close(x.get(1), 2.0))
 }
 
+///|
 test "lstsq fits an overdetermined system" {
   let a = Matrix::new(3, 1, [1.0, 1.0, 1.0])
   let b = Vector::new([2.0, 3.0, 4.0])

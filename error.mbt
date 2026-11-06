@@ -1,3 +1,4 @@
+///|
 /// Errors raised by the linear-algebra routines.
 ///
 /// Operations that can fail on the *shape or content* of their inputs — rather

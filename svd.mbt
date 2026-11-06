@@ -1,3 +1,4 @@
+///|
 /// Singular value decomposition via one-sided Jacobi orthogonalization.
 ///
 /// `svd(a)` factors a tall (`m ≥ n`) matrix as `A = U·diag(s)·Vᵀ`, where `U`
@@ -7,7 +8,6 @@
 /// rotations, so the singular values are the resulting column norms — a
 /// scheme that is accurate even when singular values are tiny. Raises
 /// `DimensionMismatch` when the matrix has more columns than rows.
-
 pub fn svd(a : Matrix) -> (Matrix, Vector, Matrix) raise LinAlgError {
   let m = a.rows()
   let n = a.cols()

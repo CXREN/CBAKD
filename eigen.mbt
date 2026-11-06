@@ -1,3 +1,4 @@
+///|
 /// Symmetric eigenvalue decomposition via cyclic Jacobi rotations.
 ///
 /// `eig_sym(a)` returns the eigenvalues (as a `Vector`, sorted by the
@@ -6,7 +7,6 @@
 /// `A·V = V·diag(values)`. Jacobi rotations are unconditionally convergent for
 /// real symmetric matrices and are numerically very accurate for small-to-
 /// medium sizes.
-
 pub fn eig_sym(a : Matrix) -> (Vector, Matrix) raise LinAlgError {
   if !a.is_square() {
     raise DimensionMismatch

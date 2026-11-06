@@ -7,6 +7,7 @@
 /// eigenvalue decomposition, the singular value decomposition, and principal
 /// component analysis — with no internal sub-package boundaries.
 
+///|
 /// The package version.
 pub fn version() -> String {
   "0.1.0"

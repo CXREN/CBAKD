@@ -1,3 +1,4 @@
+///|
 /// Principal component analysis of a data matrix.
 ///
 /// `pca(x)` treats rows of `x` as samples and columns as features. It centers
@@ -5,13 +6,13 @@
 /// eigendecomposition sorted by descending variance. The result carries the
 /// feature means, the principal components as orthonormal columns, and the
 /// variances (eigenvalues) of each component.
-
 pub struct PCA {
   mean : Vector
   components : Matrix
   variance : Vector
 }
 
+///|
 /// Fit a PCA model. Requires at least two samples (`m ≥ 2`).
 pub fn pca(x : Matrix) -> PCA raise LinAlgError {
   let m = x.rows()
@@ -64,9 +65,10 @@ pub fn pca(x : Matrix) -> PCA raise LinAlgError {
       components.set(i, j, vectors.get(i, src))
     }
   }
-  { mean, components, variance }
+  { mean, components, variance, }
 }
 
+///|
 /// Center new data with the learned means and project it onto the components.
 pub fn PCA::transform(self : PCA, x : Matrix) -> Matrix raise LinAlgError {
   let m = x.rows()

@@ -1,9 +1,11 @@
 // Shared floating-point comparison helpers for the test suite.
 
+///|
 fn close(a : Double, b : Double) -> Bool {
   (a - b).abs() < 1.0e-9
 }
 
+///|
 fn mat_close(a : Matrix, b : Matrix) -> Bool {
   if a.rows() != b.rows() || a.cols() != b.cols() {
     false

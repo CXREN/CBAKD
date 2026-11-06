@@ -1,3 +1,4 @@
+///|
 /// LU factorization with partial pivoting.
 ///
 /// `lu(a)` factors a square matrix `A` as `P·A = L·U`, where `P` is a
@@ -7,13 +8,13 @@
 /// step the largest-magnitude entry in the pivot column is swapped to the
 /// diagonal, which keeps the factorization stable for all but the most
 /// ill-conditioned inputs.
-
 pub struct LU {
   lu : Matrix
   piv : Array[Int]
   sign : Int
 }
 
+///|
 /// Factor a square matrix with partial pivoting. Raises `Singular` when a
 /// zero pivot is encountered.
 pub fn lu(a : Matrix) -> LU raise LinAlgError {
@@ -58,9 +59,10 @@ pub fn lu(a : Matrix) -> LU raise LinAlgError {
       }
     }
   }
-  { lu: u, piv, sign }
+  { lu: u, piv, sign, }
 }
 
+///|
 /// Solve `A·x = b` for the original matrix using the stored factorization.
 pub fn LU::solve(self : LU, b : Vector) -> Vector raise LinAlgError {
   let n = self.lu.rows()
@@ -92,6 +94,7 @@ pub fn LU::solve(self : LU, b : Vector) -> Vector raise LinAlgError {
   x
 }
 
+///|
 /// Determinant of the original matrix (sign and product of the pivots).
 pub fn LU::det(self : LU) -> Double {
   let n = self.lu.rows()
@@ -106,6 +109,7 @@ pub fn LU::det(self : LU) -> Double {
   }
 }
 
+///|
 /// Inverse of the original matrix, computed column by column.
 pub fn LU::inverse(self : LU) -> Matrix {
   let n = self.lu.rows()
@@ -113,9 +117,7 @@ pub fn LU::inverse(self : LU) -> Matrix {
   for j in 0..<n {
     let e = Vector::zeros(n)
     e.set(j, 1.0)
-    let col = try {
-      self.solve(e)
-    } catch {
+    let col = self.solve(e) catch {
       _ => abort("LU::inverse: solve failed on a non-singular factorization")
     }
     for i in 0..<n {
@@ -125,12 +127,12 @@ pub fn LU::inverse(self : LU) -> Matrix {
   inv
 }
 
+///|
 /// Cholesky factorization of a symmetric positive-definite matrix.
 ///
 /// `cholesky(a)` returns the lower-triangular `L` such that `A = L·Lᵀ`. Only
 /// the lower triangle of `a` is read; symmetry is the caller's contract.
 /// Raises `NotPositiveDefinite` when a diagonal pivot is non-positive.
-
 pub fn cholesky(a : Matrix) -> Matrix raise LinAlgError {
   if !a.is_square() {
     raise DimensionMismatch
@@ -138,7 +140,7 @@ pub fn cholesky(a : Matrix) -> Matrix raise LinAlgError {
   let n = a.rows()
   let l = Matrix::zeros(n, n)
   for i in 0..<n {
-    for j in 0..=i {
+    for j in 0..<=i {
       let mut s = a.get(i, j)
       for k in 0..<j {
         s = s - l.get(i, k) * l.get(j, k)
@@ -156,6 +158,7 @@ pub fn cholesky(a : Matrix) -> Matrix raise LinAlgError {
   l
 }
 
+///|
 /// Solve `A·x = b` for a symmetric positive-definite `A` via Cholesky.
 pub fn cholesky_solve(a : Matrix, b : Vector) -> Vector raise LinAlgError {
   let n = a.rows()
@@ -185,17 +188,18 @@ pub fn cholesky_solve(a : Matrix, b : Vector) -> Vector raise LinAlgError {
   x
 }
 
+///|
 /// QR factorization of a tall (`m ≥ n`) matrix via Householder reflectors.
 ///
 /// `qr(a)` returns `Q` (`m × m`, orthogonal) and `R` (`m × n`, upper
 /// triangular in its top `n × n` block) such that `A = Q·R`. Raises
 /// `DimensionMismatch` when the matrix has more columns than rows.
-
 pub struct QR {
   q : Matrix
   r : Matrix
 }
 
+///|
 pub fn qr(a : Matrix) -> QR raise LinAlgError {
   let m = a.rows()
   let n = a.cols()
@@ -253,9 +257,10 @@ pub fn qr(a : Matrix) -> QR raise LinAlgError {
       }
     }
   }
-  { q, r }
+  { q, r, }
 }
 
+///|
 /// Solve the least-squares problem `min ‖A·x − b‖₂` using `A = Q·R`.
 ///
 /// Computes `x = R⁻¹ · (Qᵀ b)` on the top `n × n` block of `R`.
