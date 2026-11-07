@@ -6,7 +6,7 @@ fn close(a : Double, b : Double) -> Bool {
 }
 
 ///|
-fn mat_close(a : Matrix, b : Matrix) -> Bool {
+fn mat_close(a : @CBAKD.Matrix, b : @CBAKD.Matrix) -> Bool {
   if a.rows() != b.rows() || a.cols() != b.cols() {
     false
   } else {
